@@ -1,0 +1,138 @@
+erDiagram
+    INITIATIVE ||--o{ IMPACT : has
+    EVENT ||--o{ ORGANIZER : has
+    EVENT ||--o{ IMAGE : contains
+    VOLUNTEER ||--o{ EVENT : attends
+    TEAM_MEMBER ||--o{ SOCIAL_LINKS : has
+    ADMIN ||--o{ INITIATIVE : manages
+    ADMIN ||--o{ EVENT : manages
+    
+    INITIATIVE {
+        ObjectId _id PK
+        string title
+        string slug UK
+        string description
+        string shortDescription
+        enum category
+        string image
+        array images
+        object impact
+        enum status
+        boolean featured
+        date startDate
+        date endDate
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    EVENT {
+        ObjectId _id PK
+        string title
+        string description
+        date date
+        date endDate
+        string time
+        object location
+        enum category
+        string coverImage
+        array images
+        array organizers
+        object attendees
+        enum status
+        boolean featured
+        boolean registrationRequired
+        string registrationLink
+        array highlights
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    TEAM_MEMBER {
+        ObjectId _id PK
+        string name
+        enum role
+        string department
+        enum year
+        string bio
+        string image
+        string email
+        string phone
+        object socialLinks
+        date joinDate
+        boolean active
+        number displayOrder
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    VOLUNTEER {
+        ObjectId _id PK
+        string name
+        string email
+        string phone
+        string college
+        string department
+        enum year
+        array interests
+        enum availability
+        array skills
+        string experience
+        string whyJoin
+        enum status
+        number hoursContributed
+        array eventsAttended
+        string notes
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    CONTACT {
+        ObjectId _id PK
+        string name
+        string email
+        string phone
+        string subject
+        string message
+        enum category
+        enum status
+        object reply
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    ADMIN {
+        ObjectId _id PK
+        string name
+        string email UK
+        string password
+        enum role
+        boolean active
+        date lastLogin
+        timestamp createdAt
+        timestamp updatedAt
+    }
+    
+    IMPACT {
+        number studentsHelped
+        number booksDistributed
+        number volunteersInvolved
+        array customMetrics
+    }
+    
+    ORGANIZER {
+        string name
+        string role
+        string contact
+    }
+    
+    IMAGE {
+        string url
+        string caption
+    }
+    
+    SOCIAL_LINKS {
+        string linkedin
+        string twitter
+        string instagram
+        string facebook
+    }

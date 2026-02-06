@@ -1,0 +1,64 @@
+graph LR
+    subgraph "User Interactions"
+        A[Website Visitor] -->|Browse| B[View Initiatives]
+        A -->|Explore| C[View Events]
+        A -->|Connect| D[Contact Form]
+        A -->|Join| E[Volunteer Registration]
+    end
+    
+    subgraph "Frontend React App"
+        B --> F[Initiative Page]
+        C --> G[Events Page]
+        D --> H[Contact Page]
+        E --> I[Get Involved Page]
+        
+        F -->|API Call| J[Axios HTTP Client]
+        G -->|API Call| J
+        H -->|API Call| J
+        I -->|API Call| J
+    end
+    
+    subgraph "Backend API"
+        J -->|GET /api/initiatives| K[Initiative Routes]
+        J -->|GET /api/events| L[Event Routes]
+        J -->|POST /api/contact| M[Contact Routes]
+        J -->|POST /api/volunteers/register| N[Volunteer Routes]
+        
+        K --> O[Initiative Controller]
+        L --> P[Event Controller]
+        M --> Q[Contact Controller]
+        N --> R[Volunteer Controller]
+    end
+    
+    subgraph "Database Layer"
+        O -->|Query| S[(MongoDB)]
+        P -->|Query| S
+        Q -->|Insert| S
+        R -->|Insert| S
+        
+        S --> T[Initiatives Collection]
+        S --> U[Events Collection]
+        S --> V[Contacts Collection]
+        S --> W[Volunteers Collection]
+    end
+    
+    subgraph "Admin Panel"
+        X[Admin User] -->|Login| Y[Auth Route]
+        Y -->|JWT Token| Z[Protected Routes]
+        Z -->|CRUD Operations| O
+        Z -->|CRUD Operations| P
+        Z -->|View Submissions| Q
+        Z -->|Manage Volunteers| R
+    end
+    
+    subgraph "File Management"
+        AA[File Upload] -->|Multer| AB[Local Storage]
+        AB -->|Optional| AC[Cloudinary CDN]
+    end
+    
+    style A fill:#00CEC9,color:#fff
+    style X fill:#FF6B6B,color:#fff
+    style S fill:#FFD93D
+    
+    O -.->|Upload Image| AA
+    P -.->|Upload Image| AA

@@ -1,0 +1,64 @@
+graph TB
+    subgraph "Frontend - React + Vite"
+        A[User Browser] --> B[React Router]
+        B --> C[Pages]
+        C --> D[Home]
+        C --> E[Initiatives]
+        C --> F[Events]
+        C --> G[Team]
+        C --> H[Get Involved]
+        C --> I[Contact]
+        
+        J[Components] --> K[Navbar]
+        J --> L[Footer]
+        J --> M[Cards]
+        
+        N[Services] --> O[API Client - Axios]
+        
+        P[State Management] --> O
+    end
+    
+    subgraph "Backend - Node.js + Express"
+        Q[Express Server] --> R[Routes]
+        R --> S[Initiatives Routes]
+        R --> T[Events Routes]
+        R --> U[Team Routes]
+        R --> V[Volunteers Routes]
+        R --> W[Contact Routes]
+        R --> X[Auth Routes]
+        
+        Y[Controllers] --> Z[Business Logic]
+        
+        AA[Middleware] --> AB[Authentication - JWT]
+        AA --> AC[File Upload - Multer]
+        AA --> AD[Authorization]
+    end
+    
+    subgraph "Database - MongoDB"
+        AE[(MongoDB)] --> AF[Initiative Model]
+        AE --> AG[Event Model]
+        AE --> AH[Team Member Model]
+        AE --> AI[Volunteer Model]
+        AE --> AJ[Contact Model]
+        AE --> AK[Admin Model]
+    end
+    
+    O -->|API Requests| Q
+    Q -->|CRUD Operations| Z
+    Z -->|Mongoose ODM| AE
+    AB -->|Validate Token| AK
+    
+    AL[File Storage] --> AM[Local /uploads]
+    AL --> AN[Optional: Cloudinary]
+    
+    style A fill:#00CEC9
+    style Q fill:#FF6B6B
+    style AE fill:#FFD93D
+    
+    classDef frontend fill:#e1f5ff,stroke:#0288d1
+    classDef backend fill:#fff3e0,stroke:#f57c00
+    classDef database fill:#f3e5f5,stroke:#7b1fa2
+    
+    class A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P frontend
+    class Q,R,S,T,U,V,W,X,Y,Z,AA,AB,AC,AD backend
+    class AE,AF,AG,AH,AI,AJ,AK database
