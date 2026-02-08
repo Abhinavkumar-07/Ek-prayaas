@@ -25,8 +25,8 @@ exports.register = async (req, res) => {
     await user.save();
 
     // --- REAL EMAIL SENDING LOGIC ---
-    // Use the dynamic URL from env or fallback to localhost
-    const clientUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    // Use the dynamic URL from env or fallback to url
+    const clientUrl = process.env.FRONTEND_URL || 'https://ek-prayaas.vercel.app';
     const verifyUrl = `${clientUrl}/verify/${verificationToken}`;
 
     const message = `
