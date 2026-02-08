@@ -36,6 +36,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} /> {/* <--- ADDED ROUTE */}
           <Route path="/verify/:token" element={<VerifyEmail />} />
+          
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
