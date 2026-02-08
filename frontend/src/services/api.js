@@ -1,6 +1,6 @@
 ﻿import axios from 'axios';
 
-// Use relative path for production (Single Project setup via vercel.json)
+// CORRECT: Single declaration using relative path
 const API_URL = '/api';
 
 const api = axios.create({
