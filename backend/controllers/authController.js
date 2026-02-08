@@ -158,7 +158,7 @@ exports.forgotPassword = async (req, res) => {
 
     // 4. Create Reset URL
     // NOTE: Ensure process.env.CLIENT_URL is set in Vercel (e.g., https://your-frontend.vercel.app)
-    const resetUrl = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
 
     const message = `
       <h1>Password Reset Request</h1>
