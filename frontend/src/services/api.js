@@ -1,6 +1,6 @@
 ﻿import axios from 'axios';
 
-// CORRECT: Single declaration using relative path
+// Use relative path for Vercel Monorepo deployment
 const API_URL = '/api';
 
 const api = axios.create({
@@ -20,7 +20,8 @@ export const authAPI = {
   register: (data) => api.post('/auth/register', data),
   getMe: () => api.get('/auth/me'),
   verifyEmail: (token) => api.get(`/auth/verify/${token}`),
-  forgotPassword: (data) => api.post('/auth/forgot-password', data)
+  forgotPassword: (data) => api.post('/auth/forgot-password', data),
+  resetPassword: (token, data) => api.put(`/auth/reset-password/${token}`, data)
 };
 
 export const volunteersAPI = {
@@ -28,7 +29,7 @@ export const volunteersAPI = {
 };
 
 export const contactAPI = {
-  submit: (data) => api.post('/contact', data) 
+  send: (data) => api.post('/contact', data)
 };
 
 export const eventsAPI = {
@@ -41,6 +42,10 @@ export const initiativesAPI = {
   getAll: () => api.get('/initiatives'),
   getFeatured: () => api.get('/initiatives?featured=true'),
   getById: (id) => api.get(`/initiatives/${id}`)
+};
+
+export const galleryAPI = {
+  getAll: () => api.get('/gallery')
 };
 
 export const teamAPI = {

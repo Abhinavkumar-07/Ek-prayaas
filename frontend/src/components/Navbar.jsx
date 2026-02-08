@@ -26,6 +26,7 @@ const Navbar = () => {
     { name: 'About', path: '/about' },
     { name: 'Initiatives', path: '/initiatives' },
     { name: 'Events', path: '/events' },
+    { name: 'Gallery', path: '/gallery' }, // <--- ADDED HERE
     { name: 'Team', path: '/team' },
     { name: 'Get Involved', path: '/get-involved' },
     { name: 'Contact', path: '/contact' },
@@ -40,7 +41,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto container-padding">
         <div className="flex justify-between items-center">
           
-          {/* --- LOGO --- */}
+          {/* LOGO */}
           <Link to="/" className="flex items-center space-x-3">
             <img
               src="/logo.png"
@@ -62,7 +63,7 @@ const Navbar = () => {
             </div>
           </Link>
 
-          {/* --- DESKTOP MENU --- */}
+          {/* DESKTOP MENU */}
           <div className="hidden lg:flex items-center space-x-1">
             {navLinks.map((link) => (
               <Link
@@ -102,7 +103,7 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* --- MOBILE HAMBURGER BUTTON --- */}
+          {/* MOBILE HAMBURGER */}
           <button
             onClick={() => setIsOpen(!isOpen)}
             className={`lg:hidden p-2 rounded-lg ${
@@ -113,7 +114,7 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* --- MOBILE MENU (FIXED!) --- */}
+        {/* MOBILE MENU */}
         <AnimatePresence>
           {isOpen && (
             <motion.div
@@ -123,16 +124,11 @@ const Navbar = () => {
               className="lg:hidden mt-4 pb-4"
             >
               <div className="flex flex-col space-y-2">
-                
-                {/* 1. Login/Logout Button */}
                 {!token ? (
                   <Link
                     to="/login"
                     className={`px-4 py-3 rounded-lg font-medium ${
-                      // FIX: If scrolled, text becomes DARK. If top, text is WHITE.
-                      scrolled 
-                        ? 'text-neutral-700 hover:bg-neutral-100' 
-                        : 'text-white hover:bg-white/20'
+                      scrolled ? 'text-neutral-700 hover:bg-neutral-100' : 'text-white hover:bg-white/20'
                     }`}
                   >
                     Login
@@ -141,43 +137,31 @@ const Navbar = () => {
                   <button
                     onClick={() => { localStorage.removeItem('token'); setToken(null); window.location.href = '/login'; }}
                     className={`px-4 py-3 rounded-lg font-medium text-left ${
-                      scrolled 
-                        ? 'text-red-600 hover:bg-neutral-100' 
-                        : 'text-red-200 hover:bg-white/20'
+                      scrolled ? 'text-red-600 hover:bg-neutral-100' : 'text-red-200 hover:bg-white/20'
                     }`}
                   >
                     Logout
                   </button>
                 )}
 
-                {/* 2. Navigation Links */}
                 {navLinks.map((link) => (
                   <Link
                     key={link.path}
                     to={link.path}
                     className={`px-4 py-3 rounded-lg font-medium transition-all ${
                       location.pathname === link.path
-                        // Active State
-                        ? scrolled 
-                          ? 'bg-primary text-white' 
-                          : 'bg-white text-primary'
-                        // Inactive State (FIXED HERE)
-                        : scrolled 
-                          ? 'text-neutral-700 hover:bg-neutral-100' // Dark text when scrolled
-                          : 'text-white hover:bg-white/20'          // White text when at top
+                        ? scrolled ? 'bg-primary text-white' : 'bg-white text-primary'
+                        : scrolled ? 'text-neutral-700 hover:bg-neutral-100' : 'text-white hover:bg-white/20'
                     }`}
                   >
                     {link.name}
                   </Link>
                 ))}
 
-                {/* 3. Donate Button */}
                 <Link
                   to="/get-involved"
                   className={`mt-2 px-4 py-3 rounded-lg font-medium text-center ${
-                    scrolled 
-                      ? 'bg-primary text-white' 
-                      : 'bg-white text-primary'
+                    scrolled ? 'bg-primary text-white' : 'bg-white text-primary'
                   }`}
                 >
                   Donate Now
