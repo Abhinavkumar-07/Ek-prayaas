@@ -10,17 +10,22 @@ connectDB();
 const app = express();
 
 // 2. Middleware (The "Security Guard")
-// We allow BOTH localhost:5173 (Vite) and localhost:3000 (React) just in case.
+// Add your Vercel Frontend URL to the allowed origins list later
+const allowedOrigins = [
+  'http://localhost:5173', 
+  'http://localhost:3000',
+  'https://ek-prayaas-frontend.vercel.app' // <--- Add your future Frontend URL here
+];
+
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
 
-app.use(express.json()); // Allows server to read JSON data
+app.use(express.json()); 
 
 // 3. Routes (The "Map")
-// Ensure these files exist in your 'routes' folder!
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/volunteers', require('./routes/volunteers'));
 app.use('/api/contact', require('./routes/contact'));
@@ -33,3 +38,6 @@ app.get('/', (req, res) => {
 // 4. Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// 5. EXPORT THE APP FOR VERCEL
+module.exports = app; // <--- CRITICAL: This is required for Vercel!
