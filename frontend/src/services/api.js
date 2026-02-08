@@ -1,7 +1,6 @@
 ﻿import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
+// Use relative path for production (Single Project setup via vercel.json)
 const API_URL = '/api';
 
 const api = axios.create({
@@ -21,7 +20,7 @@ export const authAPI = {
   register: (data) => api.post('/auth/register', data),
   getMe: () => api.get('/auth/me'),
   verifyEmail: (token) => api.get(`/auth/verify/${token}`),
-  forgotPassword: (data) => api.post('/auth/forgot-password', data) // <--- ADDED THIS
+  forgotPassword: (data) => api.post('/auth/forgot-password', data)
 };
 
 export const volunteersAPI = {
