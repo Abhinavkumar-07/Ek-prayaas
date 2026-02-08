@@ -1,137 +1,116 @@
-const Admin = require('../models/Admin');
+﻿const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
-// Generate JWT token
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: '30d'
-  });
-};
-
-// @desc    Login admin
-// @route   POST /api/auth/login
-// @access  Public
-exports.login = async (req, res) => {
+// --- REGISTER USER ---
+exports.register = async (req, res) => {
+  const { name, email, password } = req.body;
   try {
-    const { email, password } = req.body;
-    
-    // Check if email and password provided
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide email and password'
-      });
-    }
-    
-    // Find admin by email (include password field)
-    const admin = await Admin.findOne({ email }).select('+password');
-    
-    if (!admin) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid credentials'
-      });
-    }
-    
-    // Check if password matches
-    const isMatch = await admin.comparePassword(password);
-    
-    if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid credentials'
-      });
-    }
-    
-    // Check if admin is active
-    if (!admin.active) {
-      return res.status(401).json({
-        success: false,
-        message: 'Account is deactivated'
-      });
-    }
-    
-    // Update last login
-    admin.lastLogin = Date.now();
-    await admin.save({ validateBeforeSave: false });
-    
-    // Generate token
-    const token = generateToken(admin._id);
-    
-    res.json({
-      success: true,
-      token,
-      data: {
-        id: admin._id,
-        name: admin.name,
-        email: admin.email,
-        role: admin.role
-      }
+    let user = await User.findOne({ email });
+    if (user) return res.status(400).json({ message: 'User already exists' });
+
+    // Generate random token
+    const verificationToken = crypto.randomBytes(20).toString('hex');
+
+    user = new User({
+      name,
+      email,
+      password: bcrypt.hashSync(password, 10), // Ensure password is hashed here if not in Model pre-save
+      isVerified: false, 
+      verificationToken: verificationToken
     });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Server Error',
-      error: error.message
+
+    await user.save();
+
+    // --- MAGICAL FIX: SIMULATE EMAIL SENDING ---
+    const verifyUrl = `http://localhost:5173/verify/${verificationToken}`;
+    
+    console.log("\n==================================================");
+    console.log("✅ ACCOUNT CREATED: " + email);
+    console.log("📧 VERIFICATION LINK (Click to Verify):");
+    console.log(verifyUrl);
+    console.log("==================================================\n");
+
+    // Return success immediately without trying to send real email
+    res.status(200).json({ 
+      message: 'Registration successful! Check your TERMINAL for the verification link.' 
     });
+
+  } catch (err) {
+    console.error("Register Error:", err.message);
+    res.status(500).send('Server error');
   }
 };
 
-// @desc    Get current logged in admin
-// @route   GET /api/auth/me
-// @access  Private
+// --- LOGIN USER ---
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    let user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: 'Invalid Credentials' });
+
+    // Compare Password
+    // Note: If you hashed it manually in register above, ensure compare works here
+    // If your User model has a pre-save hook for hashing, use that. 
+    // Assuming standard bcrypt compare:
+    const isMatch = await bcrypt.compare(password, user.password);
+    
+    // Fallback: If you are testing and manually inserted non-hashed passwords, check plain text
+    // if (password !== user.password) ... 
+    
+    if (!isMatch) return res.status(400).json({ message: 'Invalid Credentials' });
+
+    // CHECK IF VERIFIED
+    if (!user.isVerified) {
+      return res.status(401).json({ message: 'Please verify your email before logging in.' });
+    }
+
+    const payload = { user: { id: user.id } };
+    
+    // Sign Token
+    jwt.sign(
+      payload, 
+      process.env.JWT_SECRET || 'secret', // Fallback secret if .env missing
+      { expiresIn: '1h' }, 
+      (err, token) => {
+        if (err) throw err;
+        res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
+      }
+    );
+
+  } catch (err) {
+    console.error("Login Error:", err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+// --- VERIFY EMAIL ---
+exports.verifyEmail = async (req, res) => {
+  try {
+    const user = await User.findOne({ verificationToken: req.params.token });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired token' });
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    await user.save();
+
+    res.status(200).json({ message: 'Email verified successfully! You can now login.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+};
+
 exports.getMe = async (req, res) => {
   try {
-    const admin = await Admin.findById(req.admin.id);
-    
-    res.json({
-      success: true,
-      data: admin
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Server Error',
-      error: error.message
-    });
-  }
-};
-
-// @desc    Update password
-// @route   PUT /api/auth/password
-// @access  Private
-exports.updatePassword = async (req, res) => {
-  try {
-    const { currentPassword, newPassword } = req.body;
-    
-    const admin = await Admin.findById(req.admin.id).select('+password');
-    
-    // Check current password
-    const isMatch = await admin.comparePassword(currentPassword);
-    
-    if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: 'Current password is incorrect'
-      });
-    }
-    
-    // Update password
-    admin.password = newPassword;
-    await admin.save();
-    
-    const token = generateToken(admin._id);
-    
-    res.json({
-      success: true,
-      message: 'Password updated successfully',
-      token
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Server Error',
-      error: error.message
-    });
+    const user = await User.findById(req.user.id).select('-password');
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
   }
 };

@@ -1,30 +1,29 @@
-const express = require('express');
+﻿const express = require('express');
 const router = express.Router();
-const { Contact } = require('../models/index');
+const Contact = require('../models/Contact'); // Import the Model
 
+// POST /api/contact
 router.post('/', async (req, res) => {
-  try {
-    const { name, email, phone, subject, message } = req.body;
+  const { name, email, subject, message } = req.body;
 
-    await Contact.create({
+  try {
+    // 1. Create a new Contact entry
+    const newContact = new Contact({
       name,
       email,
-      phone,
       subject,
       message
     });
 
-    return res.status(200).json({
-      success: true,
-      message: 'Message sent successfully'
-    });
+    // 2. Save it to MongoDB
+    await newContact.save();
 
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to send message'
-    });
+    console.log("✅ Message Saved to Database:", name);
+    res.status(200).json({ message: 'Message sent successfully!' });
+
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
   }
 });
 

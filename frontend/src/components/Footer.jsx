@@ -29,9 +29,18 @@ const Footer = () => {
               <a href="#" className="text-neutral-400 hover:text-primary transition-colors">
                 <FaFacebook size={20} />
               </a>
-              <a href="#" className="text-neutral-400 hover:text-primary transition-colors">
+              
+              {/* --- INSTAGRAM LINK UPDATED HERE --- */}
+              <a 
+                href="https://www.instagram.com/club_ekprayass/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-neutral-400 hover:text-primary transition-colors"
+              >
                 <FaInstagram size={20} />
               </a>
+              {/* ----------------------------------- */}
+
               <a href="#" className="text-neutral-400 hover:text-primary transition-colors">
                 <FaTwitter size={20} />
               </a>

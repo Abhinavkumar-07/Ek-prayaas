@@ -1,57 +1,49 @@
-import axios from 'axios';
+﻿import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = 'http://localhost:5000/api';
 
 const api = axios.create({
   baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json'
-  }
+  headers: { 'Content-Type': 'application/json' },
+  withCredentials: true
 });
 
-// Add token to requests if available
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
 
-// Initiatives
-export const getInitiatives = (params) => api.get('/initiatives', { params });
-export const getInitiativeBySlug = (slug) => api.get(`/initiatives/${slug}`);
-
-// Events
-export const getEvents = (params) => api.get('/events', { params });
-export const getEventBySlug = (slug) => api.get(`/events/${slug}`);
-
-// Team
-export const getTeam = () => api.get('/team');
-
-// Gallery
-export const getGallery = (params) => api.get('/gallery', { params });
-
-// Contact
-// Contact (FIXED)
-export const submitContact = async (data) => {
-  const res = await api.post('/contact', data);
-
-  if (res.data && res.data.success === true) {
-    return res.data;
-  } else {
-    throw new Error(res.data?.message || 'Contact submission failed');
-  }
+export const authAPI = {
+  login: (data) => api.post('/auth/login', data),
+  register: (data) => api.post('/auth/register', data),
+  getMe: () => api.get('/auth/me'),
+  verifyEmail: (token) => api.get(`/auth/verify/${token}`),
+  forgotPassword: (data) => api.post('/auth/forgot-password', data) // <--- ADDED THIS
 };
 
+export const volunteersAPI = {
+  register: (data) => api.post('/volunteers/register', data)
+};
 
-// Newsletter
-export const subscribeNewsletter = (data) => api.post('/newsletter', data);
+export const contactAPI = {
+  send: (data) => api.post('/contact', data)
+};
 
-// Auth
-export const login = (credentials) => api.post('/auth/login', credentials);
+export const eventsAPI = {
+  getAll: () => api.get('/events'),
+  getById: (id) => api.get(`/events/${id}`),
+  getUpcoming: () => api.get('/events?sort=date')
+};
+
+export const initiativesAPI = {
+  getAll: () => api.get('/initiatives'),
+  getFeatured: () => api.get('/initiatives?featured=true'),
+  getById: (id) => api.get(`/initiatives/${id}`)
+};
+
+export const teamAPI = {
+  getAll: () => api.get('/team')
+};
 
 export default api;
