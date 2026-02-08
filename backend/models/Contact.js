@@ -8,11 +8,9 @@ const ContactSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, 'Please add an email'],
-    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please add a valid email'],
   },
   subject: {
     type: String,
-    // Removed required: true to prevent failures if subject is empty
     default: 'No Subject',
   },
   message: {
@@ -25,4 +23,5 @@ const ContactSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model('Contact', ContactSchema);
+// THIS IS THE FIX: Check if the model exists, otherwise create it
+module.exports = mongoose.models.Contact || mongoose.model('Contact', ContactSchema);
