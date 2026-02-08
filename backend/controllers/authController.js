@@ -1,15 +1,17 @@
 ﻿const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const crypto = require('crypto'); 
-const sendEmail = require('../utils/sendEmail');
+const crypto = require('crypto');
+const sendEmail = require('../utils/sendEmail'); // <--- IMPORANT: Add this import
 
+// --- REGISTER USER ---
 exports.register = async (req, res) => {
   const { name, email, password } = req.body;
   try {
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ message: 'User already exists' });
 
+    // Generate random token
     const verificationToken = crypto.randomBytes(20).toString('hex');
 
     user = new User({
@@ -17,24 +19,38 @@ exports.register = async (req, res) => {
       email,
       password: bcrypt.hashSync(password, 10),
       isVerified: false, 
-      verificationToken: verificationToken // Now this will actually save!
+      verificationToken: verificationToken
     });
 
     await user.save();
 
-    // DYNAMIC URL: Uses your environment variable or defaults to localhost
-    const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+    // --- REAL EMAIL SENDING LOGIC ---
+    // Use the dynamic URL from env or fallback to localhost
+    const clientUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
     const verifyUrl = `${clientUrl}/verify/${verificationToken}`;
-    
-    console.log("\n==================================================");
-    console.log("✅ ACCOUNT CREATED: " + email);
-    console.log("📧 VERIFICATION LINK:");
-    console.log(verifyUrl);
-    console.log("==================================================\n");
 
-    res.status(200).json({ 
-      message: 'Registration successful! Check your TERMINAL for the verification link.' 
-    });
+    const message = `
+      <h1>Email Verification</h1>
+      <p>Please click the link below to verify your account:</p>
+      <a href="${verifyUrl}" clicktracking=off>${verifyUrl}</a>
+    `;
+
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: 'Ek-Prayas: Verify your email',
+        message,
+      });
+
+      res.status(200).json({ 
+        message: 'Registration successful! Please check your email to verify account.' 
+      });
+    } catch (emailError) {
+      console.error("Email Send Error:", emailError);
+      // Optional: Delete user if email fails so they can try again
+      await User.findByIdAndDelete(user._id); 
+      return res.status(500).json({ message: 'Email could not be sent. Please try again.' });
+    }
 
   } catch (err) {
     console.error("Register Error:", err.message);
