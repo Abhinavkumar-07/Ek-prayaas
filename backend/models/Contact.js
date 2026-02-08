@@ -3,28 +3,26 @@
 const ContactSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true
+    required: [true, 'Please add a name'],
   },
   email: {
     type: String,
-    required: true
-  },
-  phone: {             // <--- ADD THIS SECTION
-    type: String,
-    required: false    // Phone can be optional
+    required: [true, 'Please add an email'],
+    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please add a valid email'],
   },
   subject: {
     type: String,
-    required: true
+    // Removed required: true to prevent failures if subject is empty
+    default: 'No Subject',
   },
   message: {
     type: String,
-    required: true
+    required: [true, 'Please add a message'],
   },
-  date: {
+  createdAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
-module.exports = mongoose.models.Contact || mongoose.model('Contact', ContactSchema);
+module.exports = mongoose.model('Contact', ContactSchema);
