@@ -9,6 +9,10 @@ const ContactSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  phone: {             // <--- ADD THIS SECTION
+    type: String,
+    required: false    // Phone can be optional
+  },
   subject: {
     type: String,
     required: true
@@ -23,5 +27,4 @@ const ContactSchema = new mongoose.Schema({
   }
 });
 
-// FIX: Check if model exists before creating it
 module.exports = mongoose.models.Contact || mongoose.model('Contact', ContactSchema);

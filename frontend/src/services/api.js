@@ -28,7 +28,7 @@ export const volunteersAPI = {
 };
 
 export const contactAPI = {
-  send: (data) => api.post('/contact', data)
+  submit: (data) => api.post('/contact', data) 
 };
 
 export const eventsAPI = {
